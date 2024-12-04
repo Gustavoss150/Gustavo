@@ -21,27 +21,38 @@ app.get('/search', (req, res) =>
     }
 
     // Função que realiza a busca nos arquivos JSON
-    const searchData = (file, key) =>
-    {
-        return new Promise((resolve, reject) => 
-        {
-            // Determina o caminho do arquivo baseado na pasta 'data'
+    const searchData = (file, key) => {
+        return new Promise((resolve, reject) => {
             const filePath = path.join(__dirname, 'data', `${file}.json`);
-            fs.readFile(filePath, 'utf8', (err, data) => // Lê o conteúdo do arquivo
-            {
-                if (err) return reject(err); // Rejeita a promessa se ocorrer erro ao ler o arquivo
+            fs.readFile(filePath, 'utf8', (err, data) => {
+                if (err) return reject(err);
                 try {
-                    const parsedData = JSON.parse(data); // Faz o parse do conteúdo JSON
+                    const parsedData = JSON.parse(data);
                     const results = parsedData.filter(item =>
-                        // Filtra itens onde qualquer valor contém a query de busca (não sensível a maiúsculas)
-                        Object.values(item).some(val => 
+                        Object.values(item).some(val =>
                             val?.toString().toLowerCase().includes(searchQuery)
                         )
-                    );
-                    // Resolve a promessa com os resultados e a chave associada
+                    ).map(item => {
+                        // Normaliza os dados conforme a necessidade
+                        if (file === 'sales_orders') {
+                            return {
+                                id: item.SalesOrderID,
+                                nome: item.MaterialName,
+                                qtd: `Qtd: ${item.Quantity}`,
+                                valor: `Valor: ${item.TotalValue}`,
+                            };
+                        } else if (file === 'purchase_orders') {
+                            return {
+                                id: item.PurchaseOrderID,
+                                nome: item.MaterialName,
+                                qtd: `Qtd: ${item.Quantity}`,
+                                custo: `Custo: ${item.TotalCost}`,
+                            };
+                        }
+                        return item; // Retorna outros itens como estão
+                    });
                     resolve({ key, results });
                 } catch (parseError) {
-                    // Rejeita a promessa se ocorrer erro ao parsear o JSON
                     reject(parseError);
                 }
             });

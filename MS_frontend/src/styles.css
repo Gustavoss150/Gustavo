@@ -67,7 +67,8 @@
   
   .result-category ul {
     list-style: none;
-    padding-left: 20px; /* Adiciona um pouco de espaço entre os itens da lista */
+    text-align: justify;
+    text-align-last: justify;
   }
   
   .result-category li {
@@ -78,7 +79,7 @@
   .result-category li .result-value {
     color: #000;
     font-weight: Arial;
-    margin-right: 1em; /* Espaço entre os valores */
+    margin-right: 2em; /* Espaço entre os valores */
     display: inline-block;
   }
   
